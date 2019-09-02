@@ -1,14 +1,20 @@
 import React from 'react';
 import Logo from '../../Logo/Logo';
 import NavigationItems from '../NavigationItems/NavigationItems';
-import './SideDrawer.css'
+import './SideDrawer.css';
+import Backdrop from '../../UI/Backdrop/Backdrop';
+import Aux from '../../../hoc/Aux';
 
 const sideDrawer = (props) => {
+    const attachedClasses = ['SideDrawer', props.open ? 'Open' : 'Close'].join(' ');
     return (
-        <div className='SideDrawer'>
-            <Logo height='11%' />
-            <NavigationItems />
-        </div>
+        <Aux>
+            <Backdrop show={ props.open } click={ props.close }/>
+            <div className={ attachedClasses }>
+                <Logo height='11%' />
+                <NavigationItems />
+            </div>
+        </Aux>
     )
 }
 
