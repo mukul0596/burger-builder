@@ -31,7 +31,7 @@ class DiliveryData extends Component {
                 },
                 email: 'test@test.com'
             },
-            diliver: 'Fastest'
+            dilivery: 'Fastest'
         }
         axios.post('/orders.json', order)
             .then((response) => {
