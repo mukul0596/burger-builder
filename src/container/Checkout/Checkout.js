@@ -5,13 +5,10 @@ import DiliveryData from './DiliveryData/DiliveryData';
 
 class checkout extends Component {
     state = {
-        ingredients: {
-            salad: 0,
-            bacon: 0,
-            meat: 0,
-            cheese: 0
-        }
+        ingredients: null,
+        totalPrice: 0
     }
+
     checkoutCancelHandler = () => {
         this.props.history.goBack();
     }
@@ -20,13 +17,18 @@ class checkout extends Component {
         this.props.history.replace('/checkout/dilivery-data');
     }
 
-    componentDidMount () {
+    componentWillMount () {
         const query = new URLSearchParams(this.props.location.search);
         const ingredients = {};
+        let totalPrice;
         for (let param of query.entries()) {
-            ingredients[param[0]] = +param[1];
+            if(param[0] === 'totalPrice') {
+                totalPrice = param[1];
+            } else {
+                ingredients[param[0]] = +param[1];
+            }
         }
-        this.setState({ ingredients })
+        this.setState({ ingredients, totalPrice })
     }
 
     render () {
@@ -36,7 +38,7 @@ class checkout extends Component {
                     ingredients={ this.state.ingredients } 
                     checkoutCancel={ this.checkoutCancelHandler } 
                     checkoutContinue={ this.checkoutContinueHandler } />
-                <Route path={this.props.match.path + '/dilivery-data'} component={ DiliveryData } />
+                <Route path={ this.props.match.path + '/dilivery-data'}  render={(props) => <DiliveryData ingredients={ this.state.ingredients } totalPrice={ this.state.totalPrice } {...props} />} />
             </div>
         )
     }
