@@ -116,14 +116,13 @@ class DiliveryData extends Component {
     }
 
     inputChangeHandler = (event) => {
-        if (event.target.name == 'dilivery') {
-            return;
-        }
         const orderForm = {
             ...this.state.orderForm
         };
         orderForm[event.target.name].value = event.target.value;
-        orderForm[event.target.name].isValid = this.checkValidity(orderForm[event.target.name].value, orderForm[event.target.name].validity)
+        if (event.target.name != 'dilivery') {
+            orderForm[event.target.name].isValid = this.checkValidity(orderForm[event.target.name].value, orderForm[event.target.name].validity)
+        }
         orderForm[event.target.name].isTouched = true;
 
         let isFormValid = true;
