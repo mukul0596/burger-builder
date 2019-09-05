@@ -116,6 +116,9 @@ class DiliveryData extends Component {
     }
 
     inputChangeHandler = (event) => {
+        if (event.target.name == 'dilivery') {
+            return;
+        }
         const orderForm = {
             ...this.state.orderForm
         };
@@ -128,7 +131,7 @@ class DiliveryData extends Component {
             isFormValid = this.state.orderForm[input].isValid && isFormValid;
         }
 
-        console.log(isFormValid)
+        console.log(this.state)
 
         this.setState({ orderForm, isFormValid });
     }
