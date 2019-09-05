@@ -3,14 +3,17 @@ import Button from '../../../component/UI/Button/Button';
 import './DiliveryData.css';
 import axios from '../../../axios-orders';
 import Spinner from '../../../component/UI/Spinner/Spinner';
+import Input from '../../../component/UI/Input/Input';
 
 class DiliveryData extends Component {
     state = {
-        name: '',
-        email: '',
-        address: {
+        orderForm: {
+            name: '',
             street: '',
             postalCode: '',
+            country: '',
+            email: '',
+            dilivery: ''
         },
         loading: false
     }
@@ -23,15 +26,15 @@ class DiliveryData extends Component {
             ingredients: this.props.ingredients,
             price: this.props.totalPrice,
             customer: {
-                name: 'Mukul Gupta',
+                name: this.state.orderForm.name,
                 address: {
-                    street: 'RM 4107 BITS Pilani',
-                    zipCode: '333031',
-                    country: 'India'
+                    street: this.state.orderForm.street,
+                    postalCode: this.state.orderForm.postalCode,
+                    country: this.state.orderForm.country
                 },
-                email: 'test@test.com'
+                email: this.state.orderForm.email
             },
-            dilivery: 'Fastest'
+            dilivery: this.state.orderForm.dilivery
         }
         axios.post('/orders.json', order)
             .then((response) => {
@@ -44,13 +47,24 @@ class DiliveryData extends Component {
             });
     }
 
+    inputChangeHandler = (event) => {
+        const orderForm = {
+            ...this.state.orderForm
+        };
+        orderForm[event.target.name] = event.target.value;
+
+        this.setState({ orderForm });
+    }
+
     render () {
         let form = (
-            <form>
-                <input type='text' name='name' placeholder='Your Name' />
-                <input type='email' name='email' placeholder='Your Mail' />
-                <input type='text' name='street' placeholder='Street' />
-                <input type='text' name='postal' placeholder='Postal Code' />
+            <form onSubmit={ this.orderHandler }>
+                <Input type='text' name='name' placeholder='Your Name' onChange={ this.inputChangeHandler } value={ this.state.orderForm.name } required />
+                <Input type='email' name='email' placeholder='Your E-Mail' onChange={ this.inputChangeHandler } value={ this.state.orderForm.email } required />
+                <Input type='text' name='street' placeholder='Street' onChange={ this.inputChangeHandler } value={ this.state.orderForm.street } required />
+                <Input type='text' name='postalCode' placeholder='Postal Code' onChange={ this.inputChangeHandler } value={ this.state.orderForm.postalCode } required />
+                <Input type='text' name='country' placeholder='Country' onChange={ this.inputChangeHandler } value={ this.state.orderForm.country } required />
+                <Input type='select' name='dilivery' options={ [{value: 'fastest', displayValue: 'Fastest'}, {value: 'cheapest', displayValue: 'Cheapest'}] } onChange={ this.inputChangeHandler } value={ this.state.orderForm.dilivery } />
                 <Button type='Success' click={ this.orderHandler }>PLACE ORDER</Button>
             </form>
         )

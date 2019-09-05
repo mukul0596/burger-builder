@@ -10,7 +10,7 @@ class Orders extends Component {
         loading: true
     }
 
-    componentWillMount () {
+    componentDidMount () {
         axios.get('/orders.json')
             .then((response) => {
                 const fetchedOrders = [];
@@ -27,6 +27,7 @@ class Orders extends Component {
     }
 
     render () {
+        this.state.orders.reverse();
         let orders = (
             this.state.orders.map(order => (
                 <Order 
