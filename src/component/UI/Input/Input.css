@@ -13,7 +13,6 @@
 .Input input, .Input textarea, .Input select {
     outline: none;
     border: 1px solid #cccccc;
-    background: #ffffff;
     font: inherit;
     padding: 6px 10px;
     width: 100%;

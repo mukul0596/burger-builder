@@ -7,13 +7,55 @@ import Input from '../../../component/UI/Input/Input';
 
 class DiliveryData extends Component {
     state = {
+        isFormValid: false,
         orderForm: {
-            name: '',
-            street: '',
-            postalCode: '',
-            country: '',
-            email: '',
-            dilivery: ''
+            name: {
+                value: '',
+                validity: {
+                    required: true
+                },
+                isValid: false,
+                isTouched: false
+            },
+            street: {
+                value: '',
+                validity: {
+                    required: true
+                },
+                isValid: false,
+                isTouched: false
+            },
+            postalCode: {
+                value: '',
+                validity: {
+                    required: true,
+                    length: 6
+                },
+                isValid: false,
+                isTouched: false
+            },
+            country: {
+                value: '',
+                validity: {
+                    required: true
+                },
+                isValid: false,
+                isTouched: false
+            },
+            email: {
+                value: '',
+                validity: {
+                    required: true,
+                    isEmail: true
+                },
+                isValid: false,
+                isTouched: false
+            },
+            dilivery: {
+                value: 'fastest',
+                validity: {},
+                isValid: true,
+            }
         },
         loading: false
     }
@@ -26,15 +68,15 @@ class DiliveryData extends Component {
             ingredients: this.props.ingredients,
             price: this.props.totalPrice,
             customer: {
-                name: this.state.orderForm.name,
+                name: this.state.orderForm.name.value,
                 address: {
-                    street: this.state.orderForm.street,
-                    postalCode: this.state.orderForm.postalCode,
-                    country: this.state.orderForm.country
+                    street: this.state.orderForm.street.value,
+                    postalCode: this.state.orderForm.postalCode.value,
+                    country: this.state.orderForm.country.value
                 },
-                email: this.state.orderForm.email
+                email: this.state.orderForm.email.value
             },
-            dilivery: this.state.orderForm.dilivery
+            dilivery: this.state.orderForm.dilivery.value
         }
         axios.post('/orders.json', order)
             .then((response) => {
@@ -47,25 +89,60 @@ class DiliveryData extends Component {
             });
     }
 
+
+    checkValidity = (value, rules) => {
+        if (!rules) {
+            return true;
+        }
+        let isValid = false;
+        if (rules.required) {
+            isValid = value.trim() !== '';
+        }
+
+        if (rules.isEmail) {
+            if(typeof value !== "undefined"){
+                let lastAtPos = value.lastIndexOf('@');
+                let lastDotPos = value.lastIndexOf('.');
+     
+                isValid = ((lastAtPos < lastDotPos && lastAtPos > 0 && value.indexOf('@@') == -1 && lastDotPos > 2 && (value.length - lastDotPos) > 2))
+            }  
+        }
+
+        if (rules.length) {
+            isValid = value.length === rules.length;
+        }
+
+        return isValid;
+    }
+
     inputChangeHandler = (event) => {
         const orderForm = {
             ...this.state.orderForm
         };
-        orderForm[event.target.name] = event.target.value;
+        orderForm[event.target.name].value = event.target.value;
+        orderForm[event.target.name].isValid = this.checkValidity(orderForm[event.target.name].value, orderForm[event.target.name].validity)
+        orderForm[event.target.name].isTouched = true;
 
-        this.setState({ orderForm });
+        let isFormValid = true;
+        for (let input in this.state.orderForm) {
+            isFormValid = this.state.orderForm[input].isValid && isFormValid;
+        }
+
+        console.log(isFormValid)
+
+        this.setState({ orderForm, isFormValid });
     }
 
     render () {
         let form = (
             <form onSubmit={ this.orderHandler }>
-                <Input type='text' name='name' placeholder='Your Name' onChange={ this.inputChangeHandler } value={ this.state.orderForm.name } required />
-                <Input type='email' name='email' placeholder='Your E-Mail' onChange={ this.inputChangeHandler } value={ this.state.orderForm.email } required />
-                <Input type='text' name='street' placeholder='Street' onChange={ this.inputChangeHandler } value={ this.state.orderForm.street } required />
-                <Input type='text' name='postalCode' placeholder='Postal Code' onChange={ this.inputChangeHandler } value={ this.state.orderForm.postalCode } required />
-                <Input type='text' name='country' placeholder='Country' onChange={ this.inputChangeHandler } value={ this.state.orderForm.country } required />
-                <Input type='select' name='dilivery' options={ [{value: 'fastest', displayValue: 'Fastest'}, {value: 'cheapest', displayValue: 'Cheapest'}] } onChange={ this.inputChangeHandler } value={ this.state.orderForm.dilivery } />
-                <Button type='Success' click={ this.orderHandler }>PLACE ORDER</Button>
+                <Input type='text' name='name' placeholder='Your Name' onChange={ this.inputChangeHandler } value={ this.state.orderForm.name.value } className={ this.state.orderForm.name.isValid || !this.state.orderForm.name.isTouched ? null : 'Invalid' } />
+                <Input type='email' name='email' placeholder='Your E-Mail' onChange={ this.inputChangeHandler } value={ this.state.orderForm.email.value } className={ this.state.orderForm.email.isValid || !this.state.orderForm.email.isTouched ? null : 'Invalid' } />
+                <Input type='text' name='street' placeholder='Street' onChange={ this.inputChangeHandler } value={ this.state.orderForm.street.value } className={ this.state.orderForm.street.isValid || !this.state.orderForm.street.isTouched ? null : 'Invalid' } />
+                <Input type='number' name='postalCode' placeholder='Postal Code' onChange={ this.inputChangeHandler } value={ this.state.orderForm.postalCode.value } className={ this.state.orderForm.postalCode.isValid || !this.state.orderForm.postalCode.isTouched ? null : 'Invalid' } />
+                <Input type='text' name='country' placeholder='Country' onChange={ this.inputChangeHandler } value={ this.state.orderForm.country.value } className={ this.state.orderForm.country.isValid || !this.state.orderForm.country.isTouched ? null : 'Invalid' } />
+                <Input type='select' name='dilivery' options={ [{value: 'fastest', displayValue: 'Fastest'}, {value: 'cheapest', displayValue: 'Cheapest'}] } onChange={ this.inputChangeHandler } value={ this.state.orderForm.dilivery.value } />
+                <Button type='Success' click={ this.orderHandler } disabled={ !this.state.isFormValid }>PLACE ORDER</Button>
             </form>
         )
         if (this.state.loading) {
